@@ -4,22 +4,54 @@ from supabase import create_client, Client
 # Configuración visual para celulares
 st.set_page_config(page_title="Seguimiento Escolar", page_icon="🏫", layout="centered")
 
-# 1. CONEXIÓN A SUPABASE
+# ==========================================
+# 1. SISTEMA DE CONTRASEÑA (PANTALLA DE BLOQUEO)
+# ==========================================
+CONTRASEÑA_CORRECTA = "pico2026" # <-- Cambia esta contraseña por la que tú quieras
+
+# Verificamos si el usuario ya inició sesión
+if "autenticado" not in st.session_state:
+    st.session_state["autenticado"] = False
+
+# Si no está autenticado, mostramos solo el formulario de login
+if not st.session_state["autenticado"]:
+    st.title("🔒 Acceso Restringido")
+    st.write("Ingresa la contraseña para ver los datos de los alumnos.")
+    
+    with st.form("formulario_login"):
+        password = st.text_input("Contraseña", type="password") # type="password" oculta las letras con puntitos
+        btn_ingresar = st.form_submit_button("Ingresar al Sistema")
+        
+        if btn_ingresar:
+            if password == CONTRASEÑA_CORRECTA:
+                st.session_state["autenticado"] = True
+                st.rerun() # Recarga la página mágicamente para mostrar el contenido
+            else:
+                st.error("Contraseña incorrecta. Intenta de nuevo.")
+    
+    # st.stop() es clave: evita que se cargue el resto del código si no hay contraseña
+    st.stop()
+
+# ==========================================
+# 2. EL CÓDIGO DE TU APLICACIÓN (SOLO SE VE SI PASA LA CONTRASEÑA)
+# ==========================================
+st.sidebar.button("Cerrar Sesión", on_click=lambda: st.session_state.update(autenticado=False))
+
+# CONEXIÓN A SUPABASE
 SUPABASE_URL = "https://libvhnsryvyhsytfandl.supabase.co"
 SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpYnZobnNyeXZ5aHN5dGZhbmRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE5MDcwMzQsImV4cCI6MjEwNzQ4MzAzNH0.pgzLmsiU1vgYuV4StnWRSEfRfu8XMD9iKoAaTV4K5Q0"
 
-# Esta función evita que se conecte mil veces a la base de datos
 @st.cache_resource
 def iniciar_conexion():
     return create_client(SUPABASE_URL, SUPABASE_KEY)
 
 supabase = iniciar_conexion()
 
-# 2. ENCABEZADO
+# ENCABEZADO
 st.title("📱 Seguimiento Escolar")
 st.write("Agrega o consulta alumnos desde cualquier dispositivo.")
 
-# 3. FORMULARIO PARA AGREGAR ALUMNOS
+# FORMULARIO PARA AGREGAR ALUMNOS
 st.header("Registrar Nuevo Alumno")
 with st.form("formulario_alumnos", clear_on_submit=True):
     nombre = st.text_input("Apellido y Nombres")
@@ -28,7 +60,6 @@ with st.form("formulario_alumnos", clear_on_submit=True):
     curso = st.text_input("Curso (Ej: 1er Año)")
     telefono = st.text_input("Teléfono")
     
-    # Botón de guardar
     boton_guardar = st.form_submit_button("Guardar en la Nube", use_container_width=True)
 
 if boton_guardar:
@@ -48,9 +79,9 @@ if boton_guardar:
     else:
         st.warning("Por favor completa al menos el Nombre y el DNI.")
 
-st.divider() # Línea separadora
+st.divider()
 
-# 4. LISTA DE ALUMNOS (ESTILO CELULAR)
+# LISTA DE ALUMNOS (ESTILO CELULAR)
 st.header("📋 Lista de Alumnos")
 
 try:
@@ -59,7 +90,6 @@ try:
     
     if alumnos:
         for alumno in alumnos:
-            # Crea un menú desplegable por cada alumno (ideal para pantallas táctiles)
             with st.expander(f"👤 {alumno['apellido_nombres']} - {alumno['curso']}"):
                 st.write(f"**DNI:** {alumno['dni']}")
                 st.write(f"**Edad:** {alumno['edad']} años")
