@@ -48,7 +48,7 @@ def iniciar_conexion():
 supabase = iniciar_conexion()
 
 # ENCABEZADO
-st.title("📱 Seguimiento de Acompañamiento Escolar")
+st.title("📱 Sistema de Acompañamiento Escolar")
 st.write("Agrega o consulta alumnos desde cualquier dispositivo.")
 
 # FORMULARIO PARA AGREGAR ALUMNOS
