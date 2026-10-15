@@ -2,12 +2,12 @@ import streamlit as st
 from supabase import create_client, Client
 
 # Configuración visual para celulares
-st.set_page_config(page_title="Seguimiento Escolar", page_icon="🏫", layout="centered")
+st.set_page_config(page_title="Sistema de Acompañamiento Escolar", page_icon="🏫", layout="centered")
 
 # ==========================================
 # 1. SISTEMA DE CONTRASEÑA (PANTALLA DE BLOQUEO)
 # ==========================================
-CONTRASEÑA_CORRECTA = "pico2026" # <-- Cambia esta contraseña por la que tú quieras
+CONTRASEÑA_CORRECTA = "Estudiante2026" # <-- Cambia esta contraseña por la que tú quieras
 
 # Verificamos si el usuario ya inició sesión
 if "autenticado" not in st.session_state:
@@ -16,7 +16,7 @@ if "autenticado" not in st.session_state:
 # Si no está autenticado, mostramos solo el formulario de login
 if not st.session_state["autenticado"]:
     st.title("🔒 Acceso Restringido")
-    st.write("Ingresa la contraseña para ver los datos de los alumnos.")
+    st.write("Ingresa la contraseña para ingresar a SAE")
     
     with st.form("formulario_login"):
         password = st.text_input("Contraseña", type="password") # type="password" oculta las letras con puntitos
@@ -48,7 +48,7 @@ def iniciar_conexion():
 supabase = iniciar_conexion()
 
 # ENCABEZADO
-st.title("📱 Seguimiento Escolar")
+st.title("📱 Seguimiento de Acompañamiento Escolar")
 st.write("Agrega o consulta alumnos desde cualquier dispositivo.")
 
 # FORMULARIO PARA AGREGAR ALUMNOS
